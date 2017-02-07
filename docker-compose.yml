@@ -1,0 +1,11 @@
+version: '2'
+services:
+  dst:
+    container_name: dst
+    image: celforyon/dst
+    network_mode: bridge
+    volumes:
+      - ./conf:/conf
+      - ./mods:/mods
+    ports:
+      - 10999:10999/udp

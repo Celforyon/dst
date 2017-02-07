@@ -1,0 +1,4 @@
+#!/bin/bash
+
+chown -R steam: /conf /mods
+sudo -u steam -H /home/steam/runner

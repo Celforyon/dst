@@ -1,0 +1,47 @@
+#!/bin/bash
+
+location=/home/steam/apps/dst/bin
+exe=./dontstarve_dedicated_server_nullrenderer
+
+cluster=Cluster_1
+caves=0
+
+pidMaster=0
+pidCaves=0
+
+proper_exit() {
+    if [ $pidCaves -ne 0 ]; then kill $pidCaves; fi
+    if [ $pidMaster -ne 0 ]; then kill $pidMaster; fi
+    exit 0
+}
+
+while getopts "cn:" o; do
+    case "$o" in
+    c)  caves=1;;
+    n)  cluster=$OPTARG;;
+    esac
+done
+shift $((OPTIND-1))
+
+logs=/conf/$cluster/Master/server_log.txt
+cd $location
+
+trap proper_exit INT
+
+if [ $caves -eq 1 ]; then
+    $exe -cluster $cluster -shard Master &
+    pidMaster=$!
+    $exe -cluster $cluster -shard Caves &
+    pidCaves=$!
+else
+    $exe -cluster $cluster -shard Master &
+    pidMaster=$!
+fi
+
+tail -f $logs &
+pidTail=$!
+
+wait $pidMaster
+
+if [ $pidCaves -ne 0 ]; then kill $pidCaves; fi
+kill $pidTail
