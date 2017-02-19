@@ -20,10 +20,11 @@ cd $location
 trap proper_exit INT
 
 if [ "$CAVES" -eq 1 ]; then
-    $exe -cluster $cluster -shard Master &
-    pidMaster=$!
-    $exe -cluster $cluster -shard Caves &
-    pidCaves=$!
+	$exe -cluster $cluster -shard Master &
+	pidMaster=$!
+	$exe -cluster $cluster -shard Caves &
+	pidCaves=$!
+	logs=$logs /conf/$cluster/Caves/server_log.txt
 else
     $exe -cluster $cluster -shard Master &
     pidMaster=$!
