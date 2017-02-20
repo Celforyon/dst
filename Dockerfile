@@ -13,7 +13,7 @@ USER steam
 WORKDIR /home/steam
 RUN mkdir apps/dst .klei
 
-RUN cmd/steamcmd +login anonymous +force_install_dir $APP_DIR +app_update $APP_ID validate +quit
+RUN bin/steamcmd +login anonymous +force_install_dir $APP_DIR +app_update $APP_ID validate +quit
 
 RUN ln -s /conf .klei/DoNotStarveTogether
 RUN mv apps/dst/mods/* /mods && rmdir apps/dst/mods
