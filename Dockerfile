@@ -1,34 +1,30 @@
-FROM debian:latest
+FROM celforyon/steamcmd
 MAINTAINER Alexis Pereda <alexis@pereda.fr>
 LABEL description="Don't Starve Together Server"
 
-RUN dpkg --add-architecture i386
-RUN apt update && apt upgrade -y &&  apt install -y lib32gcc1 lib32stdc++6 libcurl4-gnutls-dev:i386 wget sudo
+ENV APP_ID 343050
+ENV APP_DIR /home/steam/apps/dst
 
-RUN useradd -ms /bin/bash steam
-RUN mkdir /conf /mods && chown steam: /conf /mods
+USER root
+RUN mkdir /conf /mods
+RUN chown steam: /conf /mods
 
 USER steam
 WORKDIR /home/steam
-RUN mkdir -p cmd apps/dst .klei
+RUN mkdir apps/dst .klei
 
-WORKDIR /home/steam/cmd
-RUN wget -cO steamcmd_linux.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-RUN tar zxf steamcmd_linux.tar.gz && rm steamcmd_linux.tar.gz
-RUN ./steamcmd.sh +login anonymous +force_install_dir /home/steam/apps/dst +app_update 343050 validate +quit
+RUN cmd/steamcmd +login anonymous +force_install_dir $APP_DIR +app_update $APP_ID validate +quit
 
-WORKDIR /home/steam
 RUN ln -s /conf .klei/DoNotStarveTogether
 RUN mv apps/dst/mods/* /mods && rmdir apps/dst/mods
 RUN ln -s /mods apps/dst/mods
 
-COPY launcher ./
-COPY runner ./
+COPY launcher /usr/local/bin
+COPY runner /usr/local/bin
 
 USER root
 
-ENTRYPOINT ["./launcher"]
-CMD ["-nCluster_1"]
+ENTRYPOINT ["launcher"]
 
 VOLUME ["/conf", "/mods"]
 EXPOSE 10999/udp
